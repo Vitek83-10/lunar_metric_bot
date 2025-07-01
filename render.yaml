@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: lunar_metric_bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 bot.py
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        value: твой_токен
+      - key: LUNAR_API_TOKEN
+        value: твой_api
