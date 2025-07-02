@@ -1,4 +1,4 @@
-async def check_lunar_metrics(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def check_lunar_metrics(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) != 1:
         await update.message.reply_text("❗ Пример команды: /check CA_ADDRESS")
         return
