@@ -72,12 +72,3 @@ async def monitor_lunarcrush():
             if passes_filter(token):
                 message = format_token_message(token)
                 try:
-                    await app.send_message(YOUR_TELEGRAM_ID, message, disable_web_page_preview=True)
-                    sent_tokens.add(ca)
-                    logger.info(f"📬 Отправлен токен: {ca}")
-                except Exception as e:
-                    logger.error(f"❌ Ошибка отправки токена: {e}")
-        await asyncio.sleep(60)
-
-if __name__ == "__main__":
-    asyncio.run(monitor_lunarcrush())
