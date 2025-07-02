@@ -1,70 +1,52 @@
-def check_lunar_metrics(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if len(context.args) != 1:
-        await update.message.reply_text("❗ Пример команды: /check CA_ADDRESS")
+from pyrogram import Client, filters
+from pyrogram.types import Message, ReplyKeyboardMarkup
+
+# 🔐 Токен от Виктора
+BOT_TOKEN = "7587000383:AAFZKVttoUHcACMXrw2I2rWC4kQ47ExPtdg"
+API_ID = 20234202
+API_HASH = "fc0e099e810cbea903512acef8563b36"
+
+# ⚙️ Инициализация клиента
+app = Client("LunarMetricBot", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
+
+# 📌 Клавиатура «Меню»
+menu_keyboard = ReplyKeyboardMarkup(
+    [["/start", "/help"], ["/check"]],
+    resize_keyboard=True,
+    one_time_keyboard=False
+)
+
+# 🟢 Команда /start
+@app.on_message(filters.command("start"))
+async def start_handler(client, message: Message):
+    await message.reply_text(
+        "👋 Бот активен и готов к работе.\n\n"
+        "✅ Используй /check <адрес токена>, чтобы получить метрики LunarCrush.",
+        reply_markup=menu_keyboard
+    )
+
+# 📘 Команда /help
+@app.on_message(filters.command("help"))
+async def help_handler(client, message: Message):
+    await message.reply_text(
+        "ℹ️ Команды бота:\n"
+        "/start — Перезапустить бота\n"
+        "/help — Показать это сообщение\n"
+        "/check <CA> — Проверка токена по адресу (Solana)"
+    )
+
+# 🔍 Команда /check
+@app.on_message(filters.command("check"))
+async def check_handler(client, message: Message):
+    args = message.text.split()
+    if len(args) < 2:
+        await message.reply_text("❗ Пример команды: /check CA_ADDRESS")
         return
 
-    ca = context.args[0]
+    ca_address = args[1]
+    # 👇 Заглушка: здесь можно подключить реальный API LunarCrush
+    await message.reply_text(f"🔎 Проверяю токен: `{ca_address}`\n(Метрики LunarCrush скоро будут здесь)", parse_mode="Markdown")
 
-    url = f"https://lunarcrush.com/api/v3/memo/token/sol/{ca}"
-    headers = {
-        "Authorization": f"Bearer {LUNAR_API_TOKEN}"
-    }
 
-    try:
-        response = requests.get(url, headers=headers)
-        data = response.json()
-
-        metrics = data.get("data", {}).get("metrics", {})
-
-        engagements = metrics.get("twitter", {}).get("engagements", 0)
-        mentions = metrics.get("twitter", {}).get("mentions", 0)
-        creators = metrics.get("twitter", {}).get("original_posts", 0)
-        sentiment = metrics.get("twitter", {}).get("sentiment", 0)
-
-        passed = (
-            engagements >= 10 and
-            mentions >= 10 and
-            creators >= 10 and
-            sentiment >= 75
-        )
-
-        if passed:
-            result = (
-                f"✅ *Метрики пройдены:*\n"
-                f"• Engagements: {engagements}\n"
-                f"• Mentions: {mentions}\n"
-                f"• Creators: {creators}\n"
-                f"• Sentiment: {sentiment}%\n\n"
-                f"`{ca}`"
-            )
-        else:
-            result = (
-                f"❌ *Недостаточно метрик:*\n"
-                f"• Engagements: {engagements}\n"
-                f"• Mentions: {mentions}\n"
-                f"• Creators: {creators}\n"
-                f"• Sentiment: {sentiment}%\n\n"
-                f"`{ca}`"
-            )
-
-        await update.message.reply_markdown(result)
-
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка запроса: {e}")
-
-# /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("👋 Бот активен. Используй /check <адрес токена>")
-
-# Запуск
-def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("check", check_lunar_metrics))
-
-    print("✅ LunarMetricBot запущен")
-    app.run_polling()
-
-if __name__ == "__main__":
-    main()
+# 🚀 Запуск
+app.run()
