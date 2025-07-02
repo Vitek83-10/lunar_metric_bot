@@ -1,3 +1,4 @@
 #!/bin/bash
-cd src
-python3 main.py
+
+# Запуск основного бота
+python main.py
