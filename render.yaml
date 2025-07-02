@@ -1,8 +1,9 @@
 services:
   - type: worker
-    name: lunar-bot
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: bash start.sh
-    plan: free
-    region: frankfurt
+    name: lunar-metric-bot
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python3 main.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
