@@ -1,59 +1,35 @@
-import asyncio
 from pyrogram import Client, filters
-from config import BOT_TOKEN, API_ID, API_HASH
 from lunar import fetch_lunar_data, filter_lunar_tokens
+from config import BOT_TOKEN, API_ID, API_HASH
 
-bot = Client("lunar_bot", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
+app = Client("lunar_bot", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
 
-@bot.on_message(filters.command("start"))
+@app.on_message(filters.command("start"))
 async def start_command(client, message):
-    await message.reply("👋 Привет! Я готов к работе.\n\nВыберите команду ниже:")
+    await message.reply("👋 Бот запущен и готов к фильтрации LunarCrush токенов!")
 
-@bot.on_message(filters.command("help"))
-async def help_command(client, message):
-    await message.reply(
-        "🛠 Доступные команды:\n"
-        "/start — запуск\n"
-        "/status — статус\n"
-        "/test — тест\n"
-        "/help — помощь"
-    )
+@app.on_message(filters.command("check"))
+async def check_lunar(client, message):
+    try:
+        data = fetch_lunar_data()
+        filtered = filter_lunar_tokens(data)
 
-@bot.on_message(filters.command("test"))
-async def test_command(client, message):
-    await message.reply("🧪 Тестовая команда выполнена успешно!")
+        if not filtered:
+            await message.reply("❌ Нет подходящих токенов по метрикам LunarCrush.")
+            return
 
-@bot.on_message(filters.command("status"))
-async def status_command(client, message):
-    await message.reply("✅ Бот работает. LunarCrush будет опрашиваться каждые 5 минут.")
+        for token in filtered[:10]:  # максимум 10 токенов в ответ
+            msg = (
+                f"📈 <b>{token['name']} ({token['symbol']})</b>\n"
+                f"💰 Цена: ${token['price']:.6f}\n"
+                f"🔥 Engagements: {token['engagements']}\n"
+                f"💬 Mentions: {token['mentions']}\n"
+                f"🧑‍💻 Creators: {token['creators']}\n"
+                f"📊 Sentiment: {token['sentiment']}%"
+            )
+            await message.reply(msg, parse_mode="HTML")
 
-async def lunar_polling():
-    while True:
-        try:
-            tokens = await fetch_lunar_data()
-            filtered = filter_lunar_tokens(tokens)
-            for token in filtered:
-                text = (
-                    f"🌕 Найден токен:\n"
-                    f"• CA: `{token['token']}`\n"
-                    f"• Engagements: {token['engagements']}\n"
-                    f"• Mentions: {token['mentions']}\n"
-                    f"• Creators: {token['creators']}\n"
-                    f"• Sentiment: {token['sentiment']}%\n"
-                    f"\n💰 Рекомендуется к входу: ДА"
-                )
-                await bot.send_message(chat_id=message.chat.id, text=text)
-        except Exception as e:
-            print(f"[ERROR] {e}")
-        await asyncio.sleep(300)
+    except Exception as e:
+        await message.reply(f"⚠️ Ошибка: {e}")
 
-async def main():
-    await bot.start()
-    asyncio.create_task(lunar_polling())
-    await idle()
-
-if __name__ == "__main__":
-    import nest_asyncio
-    from pyrogram import idle
-    nest_asyncio.apply()
-    asyncio.run(main())
+app.run()
