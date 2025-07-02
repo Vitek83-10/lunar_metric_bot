@@ -1,52 +1,49 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message, ReplyKeyboardMarkup
 
-# 🔐 Токен от Виктора
-BOT_TOKEN = "7587000383:AAFZKVttoUHcACMXrw2I2rWC4kQ47ExPtdg"
+import os
+import logging
+
+# ✅ Включаем логирование
+logging.basicConfig(level=logging.INFO)
+
+# ✅ Конфигурация бота
 API_ID = 20234202
 API_HASH = "fc0e099e810cbea903512acef8563b36"
+BOT_TOKEN = "7587000383:AAFZKVttoUHcACMXrw2I2rWC4kQ47ExPtdg"
 
-# ⚙️ Инициализация клиента
-app = Client("LunarMetricBot", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
+# ✅ Создаём клиент
+app = Client("lunar_metric_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
-# 📌 Клавиатура «Меню»
-menu_keyboard = ReplyKeyboardMarkup(
-    [["/start", "/help"], ["/check"]],
-    resize_keyboard=True,
-    one_time_keyboard=False
+# ✅ Меню команд
+menu = ReplyKeyboardMarkup(
+    [
+        ["/start", "/status"],
+        ["/help", "/test"]
+    ],
+    resize_keyboard=True
 )
 
-# 🟢 Команда /start
+# ✅ Команда /start
 @app.on_message(filters.command("start"))
-async def start_handler(client, message: Message):
-    await message.reply_text(
-        "👋 Бот активен и готов к работе.\n\n"
-        "✅ Используй /check <адрес токена>, чтобы получить метрики LunarCrush.",
-        reply_markup=menu_keyboard
-    )
+async def start(client, message: Message):
+    await message.reply("👋 Привет! Я готов к работе.\nВыберите команду ниже:", reply_markup=menu)
 
-# 📘 Команда /help
+# ✅ Команда /status
+@app.on_message(filters.command("status"))
+async def status(client, message: Message):
+    await message.reply("✅ Бот активен и работает.")
+
+# ✅ Команда /help
 @app.on_message(filters.command("help"))
-async def help_handler(client, message: Message):
-    await message.reply_text(
-        "ℹ️ Команды бота:\n"
-        "/start — Перезапустить бота\n"
-        "/help — Показать это сообщение\n"
-        "/check <CA> — Проверка токена по адресу (Solana)"
-    )
+async def help_command(client, message: Message):
+    await message.reply("🛠 Доступные команды:\n/start — запуск\n/status — статус\n/test — тест\n/help — помощь")
 
-# 🔍 Команда /check
-@app.on_message(filters.command("check"))
-async def check_handler(client, message: Message):
-    args = message.text.split()
-    if len(args) < 2:
-        await message.reply_text("❗ Пример команды: /check CA_ADDRESS")
-        return
+# ✅ Команда /test
+@app.on_message(filters.command("test"))
+async def test_command(client, message: Message):
+    await message.reply("🧪 Тестовая команда выполнена успешно!")
 
-    ca_address = args[1]
-    # 👇 Заглушка: здесь можно подключить реальный API LunarCrush
-    await message.reply_text(f"🔎 Проверяю токен: `{ca_address}`\n(Метрики LunarCrush скоро будут здесь)", parse_mode="Markdown")
-
-
-# 🚀 Запуск
-app.run()
+# ✅ Запуск
+if __name__ == "__main__":
+    app.run()
