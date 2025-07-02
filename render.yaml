@@ -1,9 +1,7 @@
 services:
   - type: worker
-    name: lunar-metric-bot
-    runtime: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python3 main.py"
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.10
+    name: LunarMetricBot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    autoDeploy: true
