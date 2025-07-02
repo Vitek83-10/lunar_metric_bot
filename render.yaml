@@ -1,8 +1,8 @@
 services:
-  - type: web
+  - type: worker
     name: lunar-bot
     env: python
-    buildCommand: ""
+    buildCommand: pip install -r requirements.txt
     startCommand: bash start.sh
     plan: free
     region: frankfurt
