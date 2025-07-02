@@ -1,9 +1,3 @@
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-
-# Функция для получения и фильтрации данных из LunarCrush
 async def check_lunar_metrics(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) != 1:
         await update.message.reply_text("❗ Пример команды: /check CA_ADDRESS")
