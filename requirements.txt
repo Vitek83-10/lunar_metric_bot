@@ -1,4 +1,2 @@
-pyrogram==2.0.106
-tgcrypto
-aiohttp
-nest_asyncio
+python-telegram-bot==20.6
+requests
